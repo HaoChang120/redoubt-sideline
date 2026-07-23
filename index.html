@@ -627,12 +627,21 @@ function importData(ev){
         athletes:obj.athletes.filter(a=>a&&typeof a==="object"&&typeof a.name==="string").map(a=>({
           id:uid(), name:a.name, number:S(a.number),
           education:(a.education&&typeof a.education==="object")?{signed:!!a.education.signed,date:a.education.date||null}:{signed:false,date:null},
-          incidents:(Array.isArray(a.incidents)?a.incidents:[]).filter(i=>i&&typeof i==="object").map(i=>({
-            ...i, id:uid(),
-            stepDates:(i.stepDates&&typeof i.stepDates==="object")?i.stepDates:{},
-            clearance:(i.clearance&&typeof i.clearance==="object")?i.clearance:{received:false},
-            signs:Array.isArray(i.signs)?i.signs:[]
-          }))
+          incidents:(Array.isArray(a.incidents)?a.incidents:[]).filter(i=>i&&typeof i==="object").map(i=>{
+            // Coerce step to an in-range integer. A hand-edited backup with a string/float
+            // step (e.g. "3") would otherwise make advance() do "3"+1="31" and corrupt state,
+            // leaving an incident that can never be closed and is mis-statused.
+            const sn=Math.floor(Number(i.step));
+            const step=(Number.isFinite(sn)&&sn>=0&&sn<=CDC_STEPS.length)?sn:0;
+            return {
+              ...i, id:uid(), step,
+              closed:!!i.closed||step>=CDC_STEPS.length,
+              returned:i.returned||null,
+              stepDates:(i.stepDates&&typeof i.stepDates==="object")?i.stepDates:{},
+              clearance:(i.clearance&&typeof i.clearance==="object")?i.clearance:{received:false},
+              signs:Array.isArray(i.signs)?i.signs:[]
+            };
+          })
         }))
       };
       if(!confirm("Replace all current data with this backup?")) return;
