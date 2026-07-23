@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Redoubt Sideline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Redoubt brand: steel-blue primary, amber sensor accent, NO orange. Cool-dark ground.
+     (primary/accent per Hao's rebrand notes; ground/panel values are a neutral cool set to
+     be confirmed against the finished Redoubt build.) */
+  --bg:#0c0f14; --bg2:#080a0e; --panel:#13171f; --panel2:#1b212b;
+  --ink:#eef2f8; --dim:#9aa6b8; --faint:#616b7c;
+  --line:rgba(238,242,248,.10); --line2:rgba(238,242,248,.05);
+  --steel:#3d7fd4; --sky:#6fa8e6; --steel-ink:#f4f8fd;
+  --sensor:#eab04a; --good:#5fbf86; --alert:#e0544f; --signal:#6fa8e6;
+  --disp:"Bricolage Grotesque",system-ui,-apple-system,sans-serif;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,'SF Mono',Menlo,monospace;
+  --radius:14px;
+  /* aliases: Sideline's component names mapped onto the Redoubt tokens */
+  --display:var(--disp); --brand:var(--steel); --brand2:var(--sensor); --brand-ink:var(--steel-ink);
+  --ink2:var(--dim); --ink3:var(--faint);
+  --ok:var(--good); --warn:var(--sensor); --hold:var(--alert); --info:var(--signal);
+  --okbg:#0f2a1e; --warnbg:#2c2410; --holdbg:#2e1616;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:var(--display);font-size:16px;line-height:1.5;background:var(--bg);color:var(--ink);
+  padding-bottom:80px;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(120% 80% at 85% -10%, rgba(61,127,212,.12), transparent 55%)}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.01em;font-family:var(--display)}
+.serif{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--brand);letter-spacing:0}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+header{position:sticky;top:0;z-index:20;background:rgba(12,15,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.head-in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:600;font-size:.98rem;letter-spacing:.06em}
+.logo .dot{width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.logo small{display:block;font-family:var(--mono);font-size:.6rem;color:var(--ink3);font-weight:400;letter-spacing:.1em;margin-top:-1px;text-transform:uppercase}
+.team-pill{font-family:var(--mono);font-size:.74rem;color:var(--ink2);background:var(--panel2);border:1px solid var(--line);padding:5px 11px;border-radius:20px;max-width:44vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.disclaimer{background:#241a24;border:1px solid #4a3a55;border-left:3px solid #b08fd0;color:#e6d9f2;font-size:.88rem;border-radius:10px;padding:12px 14px;margin:14px 0;line-height:1.5}
+.disclaimer b{color:#fff;font-weight:600}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.section-title{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink3);margin:22px 4px 10px;font-weight:500}
+button{font-family:var(--mono);cursor:pointer;border:none;border-radius:40px}
+.btn{font-family:var(--mono);background:var(--panel2);color:var(--ink);border:1px solid var(--line2);padding:13px 18px;font-weight:500;font-size:.86rem;width:100%;transition:.15s;border-radius:40px;letter-spacing:.01em}
+.btn:active{transform:scale(.985)}
+.btn.brand{background:var(--brand);border:none;color:var(--brand-ink);font-weight:600}
+.btn.danger{background:#d64545;border:none;color:#fff;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.btn.remove{font-size:1rem;padding:17px 18px}
+.btn.ghost{background:transparent}
+.btn.sm{width:auto;padding:10px 15px;font-size:.8rem}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:saturate(.4)}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px;font:inherit;margin-top:6px}
+label{font-family:var(--mono);font-size:.72rem;letter-spacing:.03em;color:var(--ink2);display:block;margin-top:14px}
+.athlete{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:.15s}
+.athlete:active{background:var(--panel2)}
+.athlete:hover{border-color:var(--line2);background:var(--panel2)}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.jersey{width:40px;height:40px;flex:none;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--ink2);font-size:.95rem}
+.athlete .nm{flex:1;min-width:0}
+.athlete .nm b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.athlete .nm small{color:var(--ink3);font-size:.78rem}
+.badge{font-family:var(--mono);font-size:.74rem;font-weight:600;padding:6px 11px;border-radius:20px;white-space:nowrap;letter-spacing:.02em;text-transform:uppercase}
+.badge.ok{background:var(--okbg);color:#7fd3a4;border:1px solid #244f38}
+.badge.hold{background:var(--holdbg);color:#f0a898;border:1px solid #5a2b22}
+.badge.protocol{background:var(--warnbg);color:#f0c97a;border:1px solid #4a3a15}
+.empty{text-align:center;color:var(--ink3);padding:36px 16px;font-size:.9rem}
+.fab{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,var(--bg) 60%,transparent);padding:14px 16px calc(14px + env(safe-area-inset-bottom));z-index:30}
+.fab .wrap2{max-width:760px;margin:0 auto}
+.modal{position:fixed;inset:0;background:rgba(5,7,11,.76);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:18px 18px 0 0;width:100%;max-width:760px;max-height:92vh;overflow:auto;padding:20px 18px calc(28px + env(safe-area-inset-bottom))}
+.sheet-grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px}
+.x{float:right;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);width:34px;height:34px;border-radius:50%;font-size:1.1rem;line-height:1}
+.step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:none}
+.step .n{width:26px;height:26px;flex:none;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--ink3)}
+.step.done .n{background:var(--okbg);border-color:#1e4a30;color:#6fd39a}
+.step.current .n{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.step .body{flex:1}
+.step .body b{font-weight:600;font-size:.92rem}
+.step .body p{margin:2px 0 0;font-size:.8rem;color:var(--ink3)}
+.step .body .when{font-size:.75rem;color:#6fd39a;margin-top:3px}
+.pill-note{font-size:.78rem;color:var(--ink2);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-top:10px;line-height:1.4}
+.check{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:.88rem;color:var(--ink2)}
+.check input{width:auto;margin:0}
+.gate{background:var(--holdbg);border:1px solid #5a2020;color:#f0b3b3;border-radius:10px;padding:11px 12px;font-size:.82rem;margin-top:12px}
+.gate.ready{background:var(--okbg);border-color:#1e4a30;color:#9fe0bb}
+.tabline{display:flex;gap:8px;margin:2px 0 6px}
+.tab{flex:1;text-align:center;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px;font-size:.82rem;font-weight:600;color:var(--ink2)}
+.tab.on{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.meta{font-family:var(--mono);font-size:.74rem;color:var(--ink3);margin-top:4px}
+.step .n,.jersey{font-family:var(--mono)}
+.doc h1{font-family:var(--display)}
+h2{font-size:1.45rem}
+.report{font-size:.85rem;line-height:1.55}
+.report h3{margin:16px 0 4px;font-size:.95rem}
+.report .rrow{border-bottom:1px solid var(--line);padding:8px 0}
+.report .rrow b{font-weight:600}
+.ref{margin:8px 0 4px;padding-left:20px;font-size:.9rem;color:var(--ink2);line-height:1.5}
+.ref li{margin-bottom:7px}
+.ref b{color:var(--ink)}
+input[type=file]{padding:9px}
+/* screen styles for the printable compliance document */
+.doc h1{font-size:1.3rem;margin:0 0 4px;letter-spacing:-.01em}
+.doc .docmeta{color:var(--ink3);font-size:.85rem;line-height:1.45;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:4px}
+.athlete-rec{border-bottom:1px solid var(--line);padding:14px 0}
+.athlete-rec h3{font-size:1rem;margin:0 0 6px;color:var(--ink)}
+.athlete-rec .line{font-size:.9rem;color:var(--ink2);margin:4px 0}
+.athlete-rec .line b{color:var(--ink)}
+.athlete-rec .sub{font-size:.82rem;color:var(--ink3);margin:2px 0 2px 14px}
+.sigblock{margin-top:22px}
+.sigline{border-top:1px solid var(--line2);width:72%;margin-top:34px;padding-top:5px;font-size:.78rem;color:var(--ink3)}
+
+@media print{
+  header,#fab,#app{display:none !important}
+  body{background:#fff;color:#000;padding:0}
+  .modal:not(.open){display:none !important}   /* native Cmd+P with nothing open prints nothing stale */
+  .modal.open{position:static !important;inset:auto !important;background:#fff !important;display:block !important}
+  .sheet{max-width:none !important;max-height:none !important;overflow:visible !important;
+    box-shadow:none !important;border:none !important;border-radius:0 !important;padding:0 !important;
+    background:#fff !important;color:#000 !important}
+  .sheet-grab,.x,.modal button,.screen-only{display:none !important}
+  .doc h1{font-size:18pt;color:#000;margin:0 0 2pt}
+  .doc .docmeta{color:#222;font-size:10pt;border-bottom:1.5pt solid #000;padding-bottom:8pt;margin-bottom:6pt}
+  .athlete-rec{page-break-inside:avoid;border-bottom:0.75pt solid #999;padding:9pt 0}
+  .athlete-rec h3{font-size:12pt;color:#000;margin:0 0 3pt}
+  .athlete-rec .line{font-size:10pt;color:#000;margin:2pt 0}
+  .athlete-rec .sub{font-size:9pt;color:#333}
+  .sigblock{page-break-inside:avoid;margin-top:22pt}
+  .sigline{border-top:0.75pt solid #000;color:#333;font-size:9pt;margin-top:30pt}
+  @page{margin:1.6cm}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <div class="logo"><span class="dot"></span><div>REDOUBT<small>sideline</small></div></div>
+    <div class="team-pill" id="teamPill">No team</div>
+  </div>
+</header>
+
+<div class="wrap" id="app"></div>
+
+<div class="fab" id="fab"></div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+"use strict";
+// ---------- Axon Sideline: non-diagnostic concussion protocol + compliance manager ----------
+// All data stays on this device (localStorage). The app never diagnoses a concussion.
+// It helps a coach follow and document the removal, education, and CDC 6-step return-to-play
+// protocol that state law and the CDC already require.
+
+const CDC_STEPS = [
+  {t:"Back to regular activity", d:"Symptom-limited daily activity (e.g. school). Begin only after a licensed provider clears the athlete to start the return progression."},
+  {t:"Light aerobic activity", d:"5 to 10 min of walking, light jogging, or stationary bike. No resistance training."},
+  {t:"Moderate activity", d:"Moderate jogging or biking, brief running, reduced-load weightlifting."},
+  {t:"Heavy, non-contact activity", d:"Sprinting, high-intensity biking, regular weightlifting, non-contact sport-specific drills."},
+  {t:"Full-contact practice", d:"Controlled full practice, if appropriate for the sport."},
+  {t:"Return to competition", d:"Game play. Requires written clearance from a licensed provider."}
+];
+const MS_DAY = 24*60*60*1000;
+
+// Observed signs a coach can document at removal. This is a documentation checklist,
+// NOT a diagnostic score. Any one of these plus a head impact means remove and refer.
+const SIGNS = [
+  "Appears dazed, stunned, or confused",
+  "Loss of consciousness (even briefly)",
+  "Moves clumsily or off-balance",
+  "Answers questions slowly",
+  "Can't recall events before or after the hit",
+  "Headache or pressure in the head",
+  "Nausea or vomiting",
+  "Dizziness or balance problems",
+  "Sensitivity to light or noise",
+  "Feeling sluggish, hazy, foggy, or groggy"
+];
+// Emergency signs that mean call 911 now, not just remove.
+const RED_FLAGS = [
+  "One pupil larger than the other",
+  "Drowsiness or cannot be woken",
+  "A headache that gets worse and does not go away",
+  "Slurred speech, weakness, numbness, or reduced coordination",
+  "Repeated vomiting, convulsions, or seizures",
+  "Unusual behavior, increased confusion, restlessness, or agitation",
+  "Loss of consciousness (do not move; call 911)"
+];
+
+// ---------- storage ----------
+const DB = {
+  load(){ try{ return JSON.parse(localStorage.getItem("axon_sideline")||"") }catch(e){ return null } },
+  save(s){ localStorage.setItem("axon_sideline", JSON.stringify(s)) }
+};
+let state = DB.load() || { team:"", season:"", athletes:[] };
+function persist(){ DB.save(state); render(); }
+function uid(){ return "a"+Math.random().toString(36).slice(2,9) }
+function today(){ return new Date().toISOString() }
+function fmt(iso){ if(!iso) return "—"; const d=new Date(iso); return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); }
+function fmtT(iso){ if(!iso) return ""; return new Date(iso).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+// ---------- status logic ----------
+// An athlete is: cleared (no active incident), or in an active incident that is
+// "held" (removed, protocol not started/complete) until returned to competition.
+function activeIncident(a){ return (a.incidents||[]).find(i=>!i.closed) || null; }
+function statusOf(a){
+  const inc = activeIncident(a);
+  if(!inc) return {key:"ok", label:"Cleared to play"};
+  if(inc.step >= CDC_STEPS.length) return {key:"ok", label:"Cleared to play"};
+  if(inc.step === 0) return {key:"hold", label:"Removed"};
+  return {key:"protocol", label:"Step "+inc.step+" of 6"};
+}
+
+// ---------- render ----------
+const app = document.getElementById("app");
+const fab = document.getElementById("fab");
+const modalEl = document.getElementById("modal");
+const sheetEl = document.getElementById("sheet");
+
+function render(){
+  document.getElementById("teamPill").textContent = state.team ? state.team : "No team";
+  if(!state.team){ return renderSetup(); }
+  renderRoster();
+}
+
+function renderSetup(){
+  fab.innerHTML = "";
+  app.innerHTML = `
+    <div style="margin:26px 4px 22px">
+      <div class="section-title" style="margin:0 0 10px">Concussion protocol manager</div>
+      <h1 style="font-size:2.5rem;line-height:1.02;letter-spacing:-.02em">Every hit,<br><span class="serif" style="font-size:2.7rem">accounted for.</span></h1>
+      <p style="color:var(--ink2);max-width:34ch;margin:14px 0 0;font-size:1rem">Remove, document, and clear an athlete the way the law requires, in a few taps on the sideline.</p>
+    </div>
+    <div class="disclaimer"><b>This is not a diagnostic tool.</b> It helps you follow and document the concussion protocol. It does not decide whether a concussion happened. When in doubt, remove the athlete and consult a licensed provider.</div>
+    <div class="section-title">Set up your team</div>
+    <div class="card">
+      <label>Team or league name</label>
+      <input id="setTeam" placeholder="e.g. Riverside U12 Soccer" value="${esc(state.team)}">
+      <label>Season</label>
+      <input id="setSeason" placeholder="e.g. Fall 2026" value="${esc(state.season)}">
+      <div style="height:16px"></div>
+      <button class="btn brand" onclick="saveSetup()">Create team</button>
+    </div>`;
+}
+function saveSetup(){
+  const t=document.getElementById("setTeam").value.trim();
+  if(!t){ alert("Enter a team name."); return; }
+  state.team=t; state.season=document.getElementById("setSeason").value.trim();
+  persist();
+}
+
+function renderRoster(){
+  const list = state.athletes.length ? state.athletes.map(a=>{
+    const st = statusOf(a);
+    const cls = st.key==="ok"?"ok":st.key==="hold"?"hold":"protocol";
+    const j = a.number ? esc(a.number) : esc((a.name||"?").slice(0,1).toUpperCase());
+    return `<div class="athlete" onclick="openAthlete('${a.id}')">
+      <div class="jersey">${j}</div>
+      <div class="nm"><b>${esc(a.name)}</b><small>${a.education&&a.education.signed?"Education on file":"Education not signed"}</small></div>
+      <span class="badge ${cls}">${esc(st.label)}</span>
+    </div>`;
+  }).join("") : `<div class="empty">No athletes yet. Add your roster to start tracking.</div>`;
+
+  const holds = state.athletes.filter(a=>{const s=statusOf(a);return s.key!=="ok"}).length;
+
+  app.innerHTML = `
+    <div class="disclaimer"><b>Not a diagnostic tool.</b> When in doubt, sit them out and get a licensed provider. This app documents the protocol; it does not diagnose.</div>
+    ${holds?`<div class="card" style="border-color:#5a2020;background:var(--holdbg)"><b style="color:#f0a5a5">${holds} athlete${holds>1?"s":""} in the concussion protocol</b><div class="meta" style="color:#e0a5a5">Not cleared to return to competition until the 6-step protocol is complete and a provider gives written clearance.</div></div>`:""}
+    <div class="section-title" style="margin-bottom:2px">${esc(state.team)}${state.season?" · "+esc(state.season):""}</div>
+    <h2 style="font-size:1.55rem;margin:0 4px 14px">Your <span class="serif" style="font-size:1.65rem">roster.</span></h2>
+    ${list}
+    <div class="row" style="gap:10px;margin-top:18px">
+      <button class="btn ghost" style="font-size:.85rem" onclick="openHistory()">Team history</button>
+      <button class="btn ghost" style="font-size:.85rem" onclick="openReference()">Recognize &amp; respond</button>
+      <button class="btn ghost" style="font-size:.85rem" onclick="openData()">Backup data</button>
+    </div>`;
+
+  fab.innerHTML = `<div class="wrap2 row">
+    <button class="btn" onclick="openAdd()">+ Add athlete</button>
+    <button class="btn brand" onclick="openReport()">Compliance record</button>
+  </div>`;
+}
+
+// ---------- modal helpers ----------
+function openModal(html){ sheetEl.innerHTML=`<div class="sheet-grab"></div>`+html; modalEl.classList.add("open"); }
+function closeModal(){ modalEl.classList.remove("open"); }
+modalEl.addEventListener("click",e=>{ if(e.target===modalEl) closeModal(); });
+
+// ---------- add athlete ----------
+function openAdd(){
+  openModal(`<button class="x" onclick="closeModal()">&times;</button>
+    <h2>Add athlete</h2>
+    <label>Name</label><input id="aName" placeholder="Full name" autofocus>
+    <label>Jersey number (optional)</label><input id="aNum" inputmode="numeric" placeholder="e.g. 7">
+    <div style="height:18px"></div>
+    <button class="btn brand" onclick="addAthlete()">Add to roster</button>`);
+}
+function addAthlete(){
+  const n=document.getElementById("aName").value.trim();
+  if(!n){ alert("Enter a name."); return; }
+  state.athletes.push({id:uid(),name:n,number:document.getElementById("aNum").value.trim(),
+    education:{signed:false,date:null}, incidents:[]});
+  closeModal(); persist();
+}
+
+// ---------- athlete detail ----------
+function openAthlete(id){
+  const a = state.athletes.find(x=>x.id===id); if(!a) return;
+  const st = statusOf(a);
+  const inc = activeIncident(a);
+  const edu = a.education||{signed:false};
+  let body = `<button class="x" onclick="closeModal()">&times;</button>
+    <h2>${esc(a.name)}</h2>
+    <div class="meta">${a.number?"#"+esc(a.number)+" · ":""}<span class="badge ${st.key==="ok"?"ok":st.key==="hold"?"hold":"protocol"}">${esc(st.label)}</span></div>`;
+
+  const eduBlock = `<div class="section-title" style="margin-top:22px">Annual concussion education</div>
+    <div class="card" style="margin-bottom:0">
+      <div class="check"><input type="checkbox" id="eduChk" ${edu.signed?"checked":""} onchange="toggleEdu('${a.id}')">
+        <span>Athlete and parent signed the annual concussion information sheet${edu.date?" ("+fmt(edu.date)+")":""}</span></div>
+    </div>`;
+
+  if(!inc){
+    // Removal is the urgent, most-encouraged action, so it leads.
+    body += `<div class="section-title" style="margin-top:20px">Head injury</div>
+      <div class="pill-note">Use this the moment a head injury is suspected. State law requires immediate removal from play.</div>
+      <div style="height:12px"></div>
+      <button class="btn danger remove" onclick="openRemoval('${a.id}')">Log removal from play</button>
+      ${eduBlock}`;
+  } else {
+    body += renderIncident(a, inc) + eduBlock;
+  }
+
+  // history
+  const past = (a.incidents||[]).filter(i=>i.closed);
+  if(past.length){
+    body += `<div class="section-title">Incident history</div>`;
+    past.forEach(i=>{ body += `<div class="pill-note">Removed ${fmt(i.opened)} · returned ${fmt(i.returned)} · provider clearance ${i.clearance&&i.clearance.received?"on file":"not recorded"}</div>`; });
+  }
+
+  body += `<div style="height:20px"></div><button class="btn ghost" style="color:#c94a4a" onclick="removeAthlete('${a.id}')">Remove athlete from roster</button>`;
+  openModal(body);
+}
+
+function renderIncident(a, inc){
+  const stepIdx = inc.step; // 0 = removed, not started; 1..6 = on/after step
+  let steps = CDC_STEPS.map((s,i)=>{
+    const n=i+1;
+    const done = stepIdx>n;
+    const current = stepIdx===n;
+    const when = (inc.stepDates&&inc.stepDates[n])?`<div class="when">Completed ${fmtT(inc.stepDates[n])}</div>`:"";
+    return `<div class="step ${done?"done":current?"current":""}">
+      <div class="n">${done?"✓":n}</div>
+      <div class="body"><b>${esc(s.t)}</b><p>${esc(s.d)}</p>${when}</div>
+    </div>`;
+  }).join("");
+
+  // gating logic for advancing
+  let gate="", advBtn="";
+  const clearance = inc.clearance||{received:false};
+  if(stepIdx===0){
+    gate = `<div class="gate">Provider must clear the athlete to <b>begin</b> the return progression (step 1). Removal logged ${fmtT(inc.opened)}.</div>`;
+    advBtn = `<button class="btn brand" style="margin-top:12px" onclick="beginProtocol('${a.id}')">Provider cleared: begin step 1</button>`;
+  } else if(stepIdx>=1 && stepIdx<CDC_STEPS.length){
+    // 24h gate. Fail CLOSED: a missing timestamp blocks advancement, never allows it.
+    const last = inc.stepDates && inc.stepDates[stepIdx];
+    const waitOk = last ? (Date.now()-new Date(last).getTime()) >= MS_DAY : false;
+    const nextName = CDC_STEPS[stepIdx].t; // step index stepIdx is the NEXT step (0-based)
+    if(stepIdx===CDC_STEPS.length-1){
+      // next is final: return to competition, needs written clearance
+      gate = clearance.received
+        ? `<div class="gate ready">Written provider clearance on file. Athlete may complete the final step and return to competition.</div>`
+        : `<div class="gate">Final step (return to competition) requires <b>written clearance from a licensed provider</b>. Record it below first.</div>`;
+      advBtn = `<label>Provider name</label><input id="clrName" value="${esc(clearance.provider||"")}" placeholder="Dr. / ATC name">
+        <div class="check"><input type="checkbox" id="clrChk" ${clearance.received?"checked":""}> <span>Written clearance received</span></div>
+        <button class="btn" style="margin-top:10px" onclick="saveClearance('${a.id}')">Save clearance</button>
+        <button class="btn brand" style="margin-top:10px" ${(!clearance.received||!waitOk)?"disabled":""} onclick="advance('${a.id}')">Complete step 6: return to competition</button>`;
+    } else {
+      gate = waitOk
+        ? `<div class="gate ready">Ready to advance. Confirm the athlete stayed symptom-free for at least 24 hours.</div>`
+        : `<div class="gate">Each step needs a minimum of 24 hours symptom-free before advancing.${last?" Next step available "+fmtT(new Date(new Date(last).getTime()+MS_DAY).toISOString())+".":" Step start time is missing; re-log this step."}</div>`;
+      advBtn = `<button class="btn brand" style="margin-top:12px" ${!waitOk?"disabled":""} onclick="advance('${a.id}')">Symptom-free 24h: advance to next step</button>
+        <button class="btn danger" style="margin-top:10px" onclick="setback('${a.id}')">Symptoms returned: step back</button>`;
+    }
+  }
+
+  const pn = inc.parent||{notified:false};
+  const signsHtml = (Array.isArray(inc.signs)&&inc.signs.length)?`<div class="pill-note"><b style="color:var(--ink2)">Signs logged at removal:</b> ${inc.signs.map(esc).join("; ")}</div>`:"";
+  const notesHtml = inc.notes?`<div class="pill-note">"${esc(inc.notes)}"</div>`:"";
+  const parentCard = `<div class="section-title">Parent / guardian notification</div>
+    <div class="card" style="margin-bottom:0"><div class="check"><input type="checkbox" id="parentChk" ${pn.notified?"checked":""} onchange="toggleParent('${a.id}')">
+      <span>Parent or guardian notified${pn.date?" ("+fmt(pn.date)+")":""}</span></div></div>`;
+
+  return `<div class="section-title" style="margin-top:20px">Removal · ${fmt(inc.opened)}</div>
+    ${signsHtml}${notesHtml}
+    ${parentCard}
+    <div class="section-title">Return-to-play protocol (CDC 6-step)</div>
+    <div class="pill-note">Each step is a minimum of 24 hours and the athlete must be symptom-free before advancing. If symptoms return, drop back a step and rest 24 hours.</div>
+    <div class="card" style="margin:12px 0 0">${steps}</div>
+    ${gate}${advBtn}`;
+}
+
+// ---------- actions ----------
+function toggleEdu(id){
+  const a=state.athletes.find(x=>x.id===id);
+  const chk=document.getElementById("eduChk").checked;
+  a.education={signed:chk, date:chk?today():null};
+  DB.save(state); openAthlete(id); renderRoster();
+}
+function openRemoval(id){
+  const a=state.athletes.find(x=>x.id===id); if(!a) return;
+  const signs = SIGNS.map((s,i)=>`<label class="check" style="align-items:flex-start;margin-top:8px">
+     <input type="checkbox" id="sg${i}"><span>${esc(s)}</span></label>`).join("");
+  openModal(`<button class="x" onclick="closeModal()">&times;</button>
+    <h2>Remove from play</h2>
+    <div class="meta">${esc(a.name)}${a.number?" · #"+esc(a.number):""}</div>
+    <div class="gate" style="margin-top:14px;background:var(--holdbg);border-color:#5a2020;color:#f0b3b3">
+      When in doubt, remove. You do not need to be sure it is a concussion. This documents what you saw; it does not diagnose.</div>
+    <div class="section-title">Signs you observed (optional)</div>
+    ${signs}
+    <div class="section-title">Notes (optional)</div>
+    <textarea id="remNotes" rows="2" placeholder="What happened, when, any detail worth recording"></textarea>
+    <label class="check" style="margin-top:14px"><input type="checkbox" id="remParent">
+      <span>Parent or guardian was notified</span></label>
+    <div style="height:16px"></div>
+    <button class="btn danger" onclick="confirmRemoval('${a.id}')">Confirm removal from play</button>`);
+}
+function confirmRemoval(id){
+  const a=state.athletes.find(x=>x.id===id); if(!a) return;
+  const signs = SIGNS.filter((s,i)=>{const el=document.getElementById("sg"+i);return el&&el.checked;});
+  const notes = (document.getElementById("remNotes")||{}).value || "";
+  const parent = !!(document.getElementById("remParent")||{}).checked;
+  a.incidents=a.incidents||[];
+  a.incidents.push({id:uid(),opened:today(),step:0,stepDates:{},clearance:{received:false},
+    signs:signs, notes:notes.trim(), parent:{notified:parent,date:parent?today():null},
+    closed:false,returned:null});
+  DB.save(state); openAthlete(id); renderRoster();
+}
+function toggleParent(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a); if(!inc) return;
+  const chk=document.getElementById("parentChk").checked;
+  inc.parent={notified:chk,date:chk?today():null};
+  DB.save(state); openAthlete(id);
+}
+function beginProtocol(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
+  if(!inc || inc.step!==0) return;                        // only from the "removed" state
+  inc.stepDates=inc.stepDates||{};
+  inc.step=1; inc.stepDates[1]=today();
+  DB.save(state); openAthlete(id); renderRoster();
+}
+function saveClearance(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
+  if(!inc) return;
+  inc.clearance={received:document.getElementById("clrChk").checked, provider:document.getElementById("clrName").value.trim(), date:today()};
+  DB.save(state); openAthlete(id);
+}
+function advance(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
+  if(!inc) return;
+  const cur=inc.step;
+  if(cur<1 || cur>=CDC_STEPS.length) return;              // only steps 1..5 can advance
+  inc.stepDates=inc.stepDates||{};
+  // Re-enforce the 24h gate here, not just in the UI. Fail closed on missing data.
+  const last=inc.stepDates[cur];
+  const waitOk = last ? (Date.now()-new Date(last).getTime()) >= MS_DAY : false;
+  if(!waitOk) return;
+  // Advancing from the last step is the return to competition: require written clearance.
+  if(cur===CDC_STEPS.length-1 && !(inc.clearance && inc.clearance.received)) return;
+  const next=cur+1;
+  inc.step=next;
+  inc.stepDates[next]=today();
+  if(next===CDC_STEPS.length){ inc.closed=true; inc.returned=today(); }
+  DB.save(state); openAthlete(id); renderRoster();
+}
+function setback(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
+  if(!inc) return;
+  inc.stepDates=inc.stepDates||{};
+  if(inc.step>1){ inc.step-=1; inc.stepDates[inc.step]=today(); }
+  // A documented symptom relapse invalidates any prior clearance: a provider must
+  // clear the athlete again in their current state before return to competition.
+  inc.clearance={received:false};
+  DB.save(state); openAthlete(id); renderRoster();
+}
+function removeAthlete(id){
+  if(!confirm("Remove this athlete from the roster? Their incident records will be deleted.")) return;
+  state.athletes=state.athletes.filter(x=>x.id!==id);
+  closeModal(); persist();
+}
+
+// ---------- compliance record ----------
+function openHistory(){
+  // Coach-level hub: every incident across EVERY athlete, most recent first.
+  const all=[];
+  state.athletes.forEach(a=>{ (a.incidents||[]).forEach(i=>{ if(i&&typeof i==="object") all.push({a,i}); }); });
+  all.sort((x,y)=> new Date(y.i.opened||0) - new Date(x.i.opened||0));
+  const rows = all.length ? all.map(({a,i})=>{
+    const st = i.closed ? ("Returned to play "+fmt(i.returned))
+      : (i.step===0 ? "Removed, protocol not started" : "In protocol, step "+i.step+" of 6");
+    const cls = i.closed ? "ok" : (i.step===0 ? "hold" : "protocol");
+    const chip = i.closed ? "Cleared" : (i.step===0 ? "Removed" : "Step "+i.step+" of 6");
+    const clr = (i.clearance&&i.clearance.received) ? "Provider clearance on file" : "No written clearance yet";
+    const pn = (i.parent&&i.parent.notified) ? "parent notified" : "parent not notified";
+    const sg = (Array.isArray(i.signs)&&i.signs.length) ? `<div class="sub">Signs: ${i.signs.map(esc).join("; ")}</div>` : "";
+    const nt = i.notes ? `<div class="sub">Note: "${esc(i.notes)}"</div>` : "";
+    return `<div class="athlete-rec">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+        <h3 style="margin:0">${esc(a.name)}${a.number?" &middot; #"+esc(a.number):""}</h3>
+        <span class="badge ${cls}">${esc(chip)}</span></div>
+      <div class="line"><b>Removed ${fmt(i.opened)}.</b> ${esc(st)}. ${esc(clr)}, ${esc(pn)}.</div>${sg}${nt}</div>`;
+  }).join("") : `<div class="empty">No head-injury incidents recorded for any athlete yet.</div>`;
+  const total=all.length, open=all.filter(x=>!x.i.closed).length;
+  openModal(`<button class="x" onclick="closeModal()">&times;</button>
+    <div class="section-title" style="margin:0 0 2px">${esc(state.team)}${state.season?" &middot; "+esc(state.season):""}</div>
+    <h2>Team <span class="serif" style="font-size:1.5rem">history.</span></h2>
+    <div class="meta" style="margin-top:6px">${total} incident${total===1?"":"s"} across ${state.athletes.length} athlete${state.athletes.length===1?"":"s"}${open?" &middot; "+open+" still in protocol":""}</div>
+    <div style="margin-top:16px">${rows}</div>`);
+}
+function openReport(){
+  const recs = state.athletes.map(a=>{
+    const incs=a.incidents||[];
+    const edu=a.education&&a.education.signed?("Signed "+fmt(a.education.date)):"Not signed";
+    const incLines = incs.length? incs.map(i=>{
+      const steps = Object.keys(i.stepDates||{}).length;
+      const status = i.closed?("Returned to play "+fmt(i.returned)) : (i.step===0?"Removed, protocol not started":"In protocol, step "+i.step+" of 6");
+      const clr = i.clearance&&i.clearance.received?("Written clearance"+(i.clearance.provider?" ("+esc(i.clearance.provider)+")":"")+" on file"):"No written clearance recorded";
+      const pn = (i.parent&&i.parent.notified)?("Parent notified "+fmt(i.parent.date)):"Parent notification not recorded";
+      const sg = (Array.isArray(i.signs)&&i.signs.length)?`<div class="sub">Signs observed at removal: ${i.signs.map(esc).join("; ")}</div>`:"";
+      const nt = i.notes?`<div class="sub">Note: "${esc(i.notes)}"</div>`:"";
+      return `<div class="line"><b>Removed ${fmt(i.opened)}.</b> ${esc(status)}. ${steps} protocol step(s) logged. ${clr}. ${esc(pn)}.</div>${sg}${nt}`;
+    }).join("") : `<div class="line" style="color:var(--ink3)">No head-injury incidents recorded this season.</div>`;
+    return `<div class="athlete-rec"><h3>${esc(a.name)}${a.number?" &middot; #"+esc(a.number):""}</h3>
+      <div class="line">Annual concussion education: <b>${esc(edu)}</b></div>${incLines}</div>`;
+  }).join("");
+
+  openModal(`<button class="x" onclick="closeModal()">&times;</button>
+    <div class="doc">
+      <h1>Concussion Protocol Compliance Record</h1>
+      <div class="docmeta"><b style="color:var(--ink)">${esc(state.team)||"Team"}</b>${state.season?" &middot; "+esc(state.season):""}<br>Generated ${fmt(today())} &middot; ${state.athletes.length} athlete${state.athletes.length===1?"":"s"} on roster</div>
+      <div class="pill-note screen-only" style="margin:12px 0">This is the filing record. Use your browser's Print dialog and choose "Save as PDF" to keep or hand it off. It documents education sign-off, removals, and return-to-play steps. It is a compliance and documentation aid, not a medical record or a diagnosis.</div>
+      ${recs||'<div class="line">No athletes on the roster yet.</div>'}
+      <div class="sigblock">
+        <div class="line" style="color:var(--ink2)">I certify that the removals and return-to-play decisions recorded above followed our concussion protocol and applicable state law.</div>
+        <div class="sigline">Signature of coach, athletic trainer, or administrator &nbsp;&middot;&nbsp; Date</div>
+      </div>
+    </div>
+    <div style="height:18px"></div>
+    <button class="btn brand" onclick="window.print()">Print or save as PDF</button>`);
+}
+
+// ---------- sideline reference ----------
+function openReference(){
+  const signs = SIGNS.map(s=>`<li>${esc(s)}</li>`).join("");
+  const flags = RED_FLAGS.map(s=>`<li>${esc(s)}</li>`).join("");
+  const steps = CDC_STEPS.map((s,i)=>`<li><b>${i+1}. ${esc(s.t)}.</b> ${esc(s.d)}</li>`).join("");
+  openModal(`<button class="x" onclick="closeModal()">&times;</button>
+    <h2>Recognize &amp; respond</h2>
+    <div class="pill-note">A sideline reference, not a diagnosis. When in doubt, remove the athlete and get a licensed provider.</div>
+    <div class="section-title" style="color:#f0a5a5">Call 911 now if you see any of these</div>
+    <ul class="ref">${flags}</ul>
+    <div class="section-title">Signs of a possible concussion</div>
+    <ul class="ref">${signs}</ul>
+    <div class="section-title">The rule</div>
+    <div class="pill-note">A head impact plus any sign means: remove from play immediately, do not let them return the same day, notify the parent or guardian, and get written clearance from a licensed provider before return.</div>
+    <div class="section-title">Return-to-play, step by step</div>
+    <ul class="ref">${steps}</ul>`);
+}
+
+// ---------- data backup ----------
+function openData(){
+  openModal(`<button class="x" onclick="closeModal()">&times;</button>
+    <h2>Backup data</h2>
+    <div class="pill-note">All data lives only in this browser. Download a backup so a cleared browser or a new device does not lose your season.</div>
+    <div style="height:14px"></div>
+    <button class="btn brand" onclick="exportData()">Download backup file</button>
+    <label>Restore from a backup file</label>
+    <input type="file" id="impFile" accept="application/json,.json" onchange="importData(event)">`);
+}
+function exportData(){
+  try{
+    const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const el=document.createElement("a");
+    const safe=(state.team||"axon-sideline").replace(/[^a-z0-9]+/gi,"-").toLowerCase();
+    el.href=url; el.download="axon-sideline-"+safe+".json";
+    document.body.appendChild(el); el.click(); el.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch(e){ alert("Could not create the backup file."); }
+}
+function importData(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const obj=JSON.parse(rd.result);
+      if(!obj||typeof obj!=="object"||!Array.isArray(obj.athletes)) throw new Error("bad");
+      const S=v=>typeof v==="string"?v:"";
+      // Rebuild a clean state: drop malformed elements, coerce types, and regenerate
+      // every id with uid() so an imported file can never inject through an id, and a
+      // malformed element can never reach the DOM or persist.
+      const clean={
+        team:S(obj.team), season:S(obj.season),
+        athletes:obj.athletes.filter(a=>a&&typeof a==="object"&&typeof a.name==="string").map(a=>({
+          id:uid(), name:a.name, number:S(a.number),
+          education:(a.education&&typeof a.education==="object")?{signed:!!a.education.signed,date:a.education.date||null}:{signed:false,date:null},
+          incidents:(Array.isArray(a.incidents)?a.incidents:[]).filter(i=>i&&typeof i==="object").map(i=>({
+            ...i, id:uid(),
+            stepDates:(i.stepDates&&typeof i.stepDates==="object")?i.stepDates:{},
+            clearance:(i.clearance&&typeof i.clearance==="object")?i.clearance:{received:false},
+            signs:Array.isArray(i.signs)?i.signs:[]
+          }))
+        }))
+      };
+      if(!confirm("Replace all current data with this backup?")) return;
+      state=clean; DB.save(state); closeModal(); render();
+    }catch(e){ alert("That file is not a valid Axon Sideline backup."); }
+  };
+  rd.readAsText(f);
+}
+
+render();
+</script>
+</body>
+</html>
