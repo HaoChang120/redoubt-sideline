@@ -156,10 +156,12 @@ input[type=file]{padding:9px}
 
 <script>
 "use strict";
-// ---------- Axon Sideline: non-diagnostic concussion protocol + compliance manager ----------
-// All data stays on this device (localStorage). The app never diagnoses a concussion.
-// It helps a coach follow and document the removal, education, and CDC 6-step return-to-play
-// protocol that state law and the CDC already require.
+// ---------- Redoubt Sideline: concussion documentation & compliance log ----------
+// A record-keeping tool for coaching and athletic staff. NOT a medical device.
+// It does not detect, diagnose, or assess concussions and makes no return-to-play
+// decision. Licensed providers decide; this app only records what staff and providers
+// decide, and produces the paper trail state return-to-play laws require.
+// All data stays on this device (localStorage).
 
 const CDC_STEPS = [
   {t:"Back to regular activity", d:"Symptom-limited daily activity (e.g. school). Begin only after a licensed provider clears the athlete to start the return progression."},
@@ -215,9 +217,9 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;"
 function activeIncident(a){ return (a.incidents||[]).find(i=>!i.closed) || null; }
 function statusOf(a){
   const inc = activeIncident(a);
-  if(!inc) return {key:"ok", label:"Cleared to play"};
-  if(inc.step >= CDC_STEPS.length) return {key:"ok", label:"Cleared to play"};
-  if(inc.step === 0) return {key:"hold", label:"Removed"};
+  if(!inc) return {key:"ok", label:"No open incident"};
+  if(inc.step >= CDC_STEPS.length) return {key:"ok", label:"Return recorded"};
+  if(inc.step === 0) return {key:"hold", label:"Removed from play"};
   return {key:"protocol", label:"Step "+inc.step+" of 6"};
 }
 
@@ -237,11 +239,11 @@ function renderSetup(){
   fab.innerHTML = "";
   app.innerHTML = `
     <div style="margin:26px 4px 22px">
-      <div class="section-title" style="margin:0 0 10px">Concussion protocol manager</div>
+      <div class="section-title" style="margin:0 0 10px">Concussion documentation log</div>
       <h1 style="font-size:2.5rem;line-height:1.02;letter-spacing:-.02em">Every hit,<br><span class="serif" style="font-size:2.7rem">accounted for.</span></h1>
-      <p style="color:var(--ink2);max-width:34ch;margin:14px 0 0;font-size:1rem">Remove, document, and clear an athlete the way the law requires, in a few taps on the sideline.</p>
+      <p style="color:var(--ink2);max-width:34ch;margin:14px 0 0;font-size:1rem">Log a removal, record each return-to-play step, and keep the paper trail your state's concussion law requires. A few taps on the sideline.</p>
     </div>
-    <div class="disclaimer"><b>This is not a diagnostic tool.</b> It helps you follow and document the concussion protocol. It does not decide whether a concussion happened. When in doubt, remove the athlete and consult a licensed provider.</div>
+    <div class="disclaimer"><b>Not a medical device.</b> Redoubt Sideline is a record-keeping tool for coaching and athletic staff. It does not detect, diagnose, or assess concussions and makes no return-to-play decision. Your licensed provider decides; this app records what you and your provider decide. When in doubt, remove the athlete and consult a provider.</div>
     <div class="section-title">Set up your team</div>
     <div class="card">
       <label>Team or league name</label>
@@ -274,8 +276,8 @@ function renderRoster(){
   const holds = state.athletes.filter(a=>{const s=statusOf(a);return s.key!=="ok"}).length;
 
   app.innerHTML = `
-    <div class="disclaimer"><b>Not a diagnostic tool.</b> When in doubt, sit them out and get a licensed provider. This app documents the protocol; it does not diagnose.</div>
-    ${holds?`<div class="card" style="border-color:#5a2020;background:var(--holdbg)"><b style="color:#f0a5a5">${holds} athlete${holds>1?"s":""} in the concussion protocol</b><div class="meta" style="color:#e0a5a5">Not cleared to return to competition until the 6-step protocol is complete and a provider gives written clearance.</div></div>`:""}
+    <div class="disclaimer"><b>Not a medical device.</b> A record-keeping tool, not a diagnosis. When in doubt, sit them out and get a licensed provider. This app documents what your staff and providers decide; it does not decide.</div>
+    ${holds?`<div class="card" style="border-color:#5a2020;background:var(--holdbg)"><b style="color:#f0a5a5">${holds} athlete${holds>1?"s":""} with an open head-injury incident</b><div class="meta" style="color:#e0a5a5">Not yet recorded as returned to competition. Return is recorded only after your provider gives written clearance.</div></div>`:""}
     <div class="section-title" style="margin-bottom:2px">${esc(state.team)}${state.season?" · "+esc(state.season):""}</div>
     <h2 style="font-size:1.55rem;margin:0 4px 14px">Your <span class="serif" style="font-size:1.65rem">roster.</span></h2>
     ${list}
@@ -364,32 +366,32 @@ function renderIncident(a, inc){
     </div>`;
   }).join("");
 
-  // gating logic for advancing
+  // Return-to-play is recorded by staff, step by step. The app shows CDC reference
+  // guidance and flags a step logged sooner than guidance suggests — it never blocks.
+  // The licensed provider decides the pace; this app only writes down what happened.
   let gate="", advBtn="";
   const clearance = inc.clearance||{received:false};
   if(stepIdx===0){
-    gate = `<div class="gate">Provider must clear the athlete to <b>begin</b> the return progression (step 1). Removal logged ${fmtT(inc.opened)}.</div>`;
-    advBtn = `<button class="btn brand" style="margin-top:12px" onclick="beginProtocol('${a.id}')">Provider cleared: begin step 1</button>`;
+    gate = `<div class="gate">Removal logged ${fmtT(inc.opened)}. Record the start of the return progression once a licensed provider says the athlete may begin.</div>`;
+    advBtn = `<button class="btn brand" style="margin-top:12px" onclick="beginProtocol('${a.id}')">Record: provider OK'd start of progression</button>`;
   } else if(stepIdx>=1 && stepIdx<CDC_STEPS.length){
-    // 24h gate. Fail CLOSED: a missing timestamp blocks advancement, never allows it.
     const last = inc.stepDates && inc.stepDates[stepIdx];
-    const waitOk = last ? (Date.now()-new Date(last).getTime()) >= MS_DAY : false;
-    const nextName = CDC_STEPS[stepIdx].t; // step index stepIdx is the NEXT step (0-based)
+    const soon = last ? (Date.now()-new Date(last).getTime()) < MS_DAY : false;
     if(stepIdx===CDC_STEPS.length-1){
-      // next is final: return to competition, needs written clearance
+      // final step is the return to competition — clearance is a recorded field, not a lock
       gate = clearance.received
-        ? `<div class="gate ready">Written provider clearance on file. Athlete may complete the final step and return to competition.</div>`
-        : `<div class="gate">Final step (return to competition) requires <b>written clearance from a licensed provider</b>. Record it below first.</div>`;
+        ? `<div class="gate ready">Written provider clearance recorded${clearance.provider?" ("+esc(clearance.provider)+")":""}. You can record the athlete's return to competition.</div>`
+        : `<div class="gate">State return-to-play laws require <b>written clearance from a licensed provider</b> before competition. Record it here for your files.</div>`;
       advBtn = `<label>Provider name</label><input id="clrName" value="${esc(clearance.provider||"")}" placeholder="Dr. / ATC name">
-        <div class="check"><input type="checkbox" id="clrChk" ${clearance.received?"checked":""}> <span>Written clearance received</span></div>
-        <button class="btn" style="margin-top:10px" onclick="saveClearance('${a.id}')">Save clearance</button>
-        <button class="btn brand" style="margin-top:10px" ${(!clearance.received||!waitOk)?"disabled":""} onclick="advance('${a.id}')">Complete step 6: return to competition</button>`;
+        <div class="check"><input type="checkbox" id="clrChk" ${clearance.received?"checked":""}> <span>Written clearance received and on file</span></div>
+        <button class="btn" style="margin-top:10px" onclick="saveClearance('${a.id}')">Save clearance to record</button>
+        <button class="btn brand" style="margin-top:10px" onclick="confirmReturn('${a.id}')">Record return to competition</button>`;
     } else {
-      gate = waitOk
-        ? `<div class="gate ready">Ready to advance. Confirm the athlete stayed symptom-free for at least 24 hours.</div>`
-        : `<div class="gate">Each step needs a minimum of 24 hours symptom-free before advancing.${last?" Next step available "+fmtT(new Date(new Date(last).getTime()+MS_DAY).toISOString())+".":" Step start time is missing; re-log this step."}</div>`;
-      advBtn = `<button class="btn brand" style="margin-top:12px" ${!waitOk?"disabled":""} onclick="advance('${a.id}')">Symptom-free 24h: advance to next step</button>
-        <button class="btn danger" style="margin-top:10px" onclick="setback('${a.id}')">Symptoms returned: step back</button>`;
+      gate = soon
+        ? `<div class="gate">Heads up: less than 24h since the last step was logged. CDC guidance is at least 24h symptom-free between steps. You can still record it — the timing is saved to the record.</div>`
+        : `<div class="gate ready">CDC guidance: advance only after at least 24h symptom-free. Record the next step once your provider or staff clears it.</div>`;
+      advBtn = `<button class="btn brand" style="margin-top:12px" onclick="confirmAdvance('${a.id}')">Record step ${stepIdx} complete</button>
+        <button class="btn danger" style="margin-top:10px" onclick="setback('${a.id}')">Record symptom setback: step back</button>`;
     }
   }
 
@@ -403,8 +405,8 @@ function renderIncident(a, inc){
   return `<div class="section-title" style="margin-top:20px">Removal · ${fmt(inc.opened)}</div>
     ${signsHtml}${notesHtml}
     ${parentCard}
-    <div class="section-title">Return-to-play protocol (CDC 6-step)</div>
-    <div class="pill-note">Each step is a minimum of 24 hours and the athlete must be symptom-free before advancing. If symptoms return, drop back a step and rest 24 hours.</div>
+    <div class="section-title">Return-to-play log (CDC 6-step reference)</div>
+    <div class="pill-note">CDC guidance: keep each step at least 24 hours apart and symptom-free before advancing; if symptoms return, drop back a step. Your provider sets the pace, this app records it.</div>
     <div class="card" style="margin:12px 0 0">${steps}</div>
     ${gate}${advBtn}`;
 }
@@ -464,18 +466,30 @@ function saveClearance(id){
   inc.clearance={received:document.getElementById("clrChk").checked, provider:document.getElementById("clrName").value.trim(), date:today()};
   DB.save(state); openAthlete(id);
 }
+// The app records return-to-play steps; it does not decide or enforce medical timing.
+// Timing/clearance cautions are surfaced to the user in confirmAdvance / confirmReturn,
+// which the human can acknowledge and proceed. advance() itself only writes the record.
+function confirmAdvance(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
+  if(!inc) return;
+  const cur=inc.step, last=inc.stepDates&&inc.stepDates[cur];
+  const soon = last ? (Date.now()-new Date(last).getTime()) < MS_DAY : false;
+  if(soon && !confirm("Less than 24 hours since the previous step was logged. CDC guidance is at least 24h symptom-free between steps. Record this step anyway?")) return;
+  advance(id);
+}
+function confirmReturn(id){
+  const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
+  if(!inc) return;
+  if(!(inc.clearance && inc.clearance.received) &&
+     !confirm("No written provider clearance is on file. Recording a return to competition without documented clearance may violate your state's return-to-play law. Record anyway?")) return;
+  advance(id);
+}
 function advance(id){
   const a=state.athletes.find(x=>x.id===id); const inc=a&&activeIncident(a);
   if(!inc) return;
   const cur=inc.step;
-  if(cur<1 || cur>=CDC_STEPS.length) return;              // only steps 1..5 can advance
+  if(cur<1 || cur>=CDC_STEPS.length) return;              // structural range guard only
   inc.stepDates=inc.stepDates||{};
-  // Re-enforce the 24h gate here, not just in the UI. Fail closed on missing data.
-  const last=inc.stepDates[cur];
-  const waitOk = last ? (Date.now()-new Date(last).getTime()) >= MS_DAY : false;
-  if(!waitOk) return;
-  // Advancing from the last step is the return to competition: require written clearance.
-  if(cur===CDC_STEPS.length-1 && !(inc.clearance && inc.clearance.received)) return;
   const next=cur+1;
   inc.step=next;
   inc.stepDates[next]=today();
@@ -547,10 +561,10 @@ function openReport(){
     <div class="doc">
       <h1>Concussion Protocol Compliance Record</h1>
       <div class="docmeta"><b style="color:var(--ink)">${esc(state.team)||"Team"}</b>${state.season?" &middot; "+esc(state.season):""}<br>Generated ${fmt(today())} &middot; ${state.athletes.length} athlete${state.athletes.length===1?"":"s"} on roster</div>
-      <div class="pill-note screen-only" style="margin:12px 0">This is the filing record. Use your browser's Print dialog and choose "Save as PDF" to keep or hand it off. It documents education sign-off, removals, and return-to-play steps. It is a compliance and documentation aid, not a medical record or a diagnosis.</div>
+      <div class="pill-note screen-only" style="margin:12px 0">This is the filing record. Use your browser's Print dialog and choose "Save as PDF" to keep or hand it off. It documents education sign-off, removals, and return-to-play steps. It is an administrative documentation aid, not a medical device, a medical record, or a diagnosis.</div>
       ${recs||'<div class="line">No athletes on the roster yet.</div>'}
       <div class="sigblock">
-        <div class="line" style="color:var(--ink2)">I certify that the removals and return-to-play decisions recorded above followed our concussion protocol and applicable state law.</div>
+        <div class="line" style="color:var(--ink2)">I certify that the removals and return-to-play steps recorded above reflect the decisions our staff and licensed providers made under our concussion protocol and applicable state law.</div>
         <div class="sigline">Signature of coach, athletic trainer, or administrator &nbsp;&middot;&nbsp; Date</div>
       </div>
     </div>
@@ -570,8 +584,8 @@ function openReference(){
     <ul class="ref">${flags}</ul>
     <div class="section-title">Signs of a possible concussion</div>
     <ul class="ref">${signs}</ul>
-    <div class="section-title">The rule</div>
-    <div class="pill-note">A head impact plus any sign means: remove from play immediately, do not let them return the same day, notify the parent or guardian, and get written clearance from a licensed provider before return.</div>
+    <div class="section-title">The rule (CDC &amp; state law)</div>
+    <div class="pill-note">Under CDC guidance and state return-to-play laws: a head impact plus any sign means remove from play immediately, do not return the same day, notify the parent or guardian, and get written clearance from a licensed provider before return.</div>
     <div class="section-title">Return-to-play, step by step</div>
     <ul class="ref">${steps}</ul>`);
 }
@@ -623,7 +637,7 @@ function importData(ev){
       };
       if(!confirm("Replace all current data with this backup?")) return;
       state=clean; DB.save(state); closeModal(); render();
-    }catch(e){ alert("That file is not a valid Axon Sideline backup."); }
+    }catch(e){ alert("That file is not a valid Redoubt Sideline backup."); }
   };
   rd.readAsText(f);
 }
