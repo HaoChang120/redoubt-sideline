@@ -1,8 +1,30 @@
-# OPERATION: CARLETON → STANFORD (Year 2 Transfer)
+# OPERATION: CARLETON → STANFORD (Transfer)
 
 > This is the entity. Not a hype doc — an operating system.
 > Read the tone rule: blunt, no diplomatic framing. If a lane is failing, it says so.
 > Update the `[bracket]` fields. Empty brackets = you flying blind.
+
+---
+
+## T. THE REAL TIMELINE (fixed 2026-08 — you're a HS senior, not a college sophomore)
+
+| When | You are | The job |
+|---|---|---|
+| **Aug 2026 – spring 2027** | HS senior | Finish HS strong. **Submit a clean Carleton application.** Keep Axon compounding. |
+| **Fall 2027** | Carleton year 1 begins | The transfer machine turns ON. GPA, faculty, Axon fusion — all live. |
+| **~Mar 2028** | Carleton freshman | **"Year 2" transfer deadline.** App rests on ~ONE semester of college grades. |
+| **~Mar 2029** | Carleton sophomore | **"Year 3" transfer deadline.** App rests on TWO full years. Much stronger. |
+
+**The window decision (make this before anything else):**
+
+- **"Year 2" (apply freshman year → enter Stanford sophomore fall 2028):** the transfer committee sees **one semester** of college GPA, faculty who've known you ~10 weeks (letters take *months* — see §2), and barely more Axon than today. Applying to a ~1.5% funnel with a near-empty transcript. **This is the reflex, and it's the weakest timing available.**
+- **"Year 3" (apply sophomore year → enter Stanford junior fall 2029):** **two full years** of near-perfect GPA, real faculty relationships, far more Axon. Materially stronger application. Cost: one more year at Carleton before you leave.
+- Both require the same work *now*. Year 3 just gives the work time to become evidence.
+
+> **WINDOW DECISION (fill in):** Applying for **[ Year 2 / Year 3 ]** because **[one sentence]**.
+> My honest read: **Year 3 is the stronger play** unless you have a specific reason you can't stay two years. Don't let impatience pick Year 2 for you.
+
+**Bottom line for the next 12 months:** the transfer is *dormant*. Your real deliverables are (1) don't fumble the Carleton application, (2) finish senior year clean, (3) keep Axon shipping. Everything below activates in fall 2027.
 
 ---
 
@@ -82,32 +104,42 @@ Notice what's NOT on this list: your mentality, your football stats (unless Path
 
 ---
 
-## 4. THE 8-MONTH CADENCE (now → March submission)
+## 4. THE CADENCE
 
-Assumes you're entering Year 2 fall and submitting the transfer app in **March**. Adjust to your real calendar.
+### PHASE 0 — SENIOR YEAR OF HS (Aug 2026 → summer 2027) — the transfer is DORMANT
 
-**AUG–SEP — Set the board**
-- Lock your Path (§1). Written. Dated.
-- Pick your two target faculty *now*. Go to office hours in week 1, not week 10.
+Do not run transfer prep now. Run *these*:
+- **Submit a clean Carleton application.** You're a committed recruit, but the formal app still has to be strong — a fumbled app or a senior-year grade slide can undo a D-III offer. Confirm the deadline and whether the coach wants you applying ED. **By [date].**
+- **Finish HS grades strong.** Colleges can and do pull offers for senior slides. Don't be that story.
+- **Keep Axon shipping.** Every commit between now and fall 2027 is runway your future transfer app inherits for free. This is the highest-leverage thing you can do today that compounds.
+- **Bank writing reps.** Your HS college essays are practice for the transfer essays. Get good at the "why me / why this thing I'm building" story now.
+
+### PHASE 1 — CARLETON, transfer machine ON (fall 2027 →)
+
+Below is the ~8-month run-up to whichever March deadline you chose (§T). Anchor "Month 1" to your first term at Carleton.
+
+**MONTHS 1–2 — Set the board**
+- Lock/confirm your Path (§1) and Window (§T). Written. Dated.
+- Pick your two target faculty *in week 1*, not week 10. Office hours immediately.
 - One Axon milestone with a date (a pilot conversation, a real user, a shipped feature).
 
-**OCT–NOV — Build the evidence**
-- Faculty: be the student they remember. Ask real questions, do the optional thing, get onto a project.
-- GPA: this is the term that has to be near-perfect. Triage clubs and social before you triage sleep.
-- Axon: convert football exposure into product signal (Path A) — talk to a trainer, a coach, a parent about the concussion problem. Log it.
+**MONTHS 3–4 — Build the evidence**
+- Faculty: be the student they remember. Real questions, the optional thing, get onto a project.
+- GPA: this term has to be near-perfect. Triage clubs and social before you triage sleep.
+- Axon: convert football exposure into product signal (Path A) — talk to your team's trainer, log it.
 
-**DEC — Draft the case**
+**MONTH 5 — Draft the case**
 - First full draft of "why transfer" + why-Stanford. Ugly is fine. Existing is the bar.
-- Confirm both faculty will say yes to a letter. If either hesitates, you have a problem — fix it or find a third now, not in February.
+- Confirm both faculty will say yes to a *specific* letter. Hesitation now = fix it or find a third.
 
-**JAN–FEB — Sharpen**
+**MONTHS 6–7 — Sharpen**
 - Essays through 3+ real revisions. Kill every sentence that could be in someone else's app.
 - Formally request letters with a one-page brag sheet so they write *specifics*.
 - Axon: one more dated milestone. Momentum reads on paper.
 
-**MARCH — Submit**
+**MONTH 8 — Submit**
 - App in early. Not on the deadline.
-- Then let go of the outcome and keep building — because the plan below has to survive rejection.
+- Then let go of the outcome and keep building — the plan has to survive rejection.
 
 ---
 
