@@ -40,7 +40,20 @@ Note: Carleton is **D-III. There is no National Letter of Intent. Nothing binds 
 
 **Path A is your best play** and it's not close — it turns your biggest time-sink into your most authentic differentiator. But A only works if you *act on the fusion*, not just claim it. See §5.
 
-> **DECISION (fill this in, today):** I am running Path **[ A / B / C ]** because **[one sentence]**.
+> **DECISION (LOCKED):** Running **Path A** — football is the thread. Rationale: the 20–30 hrs/week
+> only justify themselves if they convert into Axon evidence and lived credibility. If they don't
+> convert by the October checkpoint, this decision auto-downgrades to Path B. No renegotiation.
+
+### PATH A EXECUTION — the fusion is a to-do list, not a vibe
+
+You said the sentence. Now it has to be *true on paper*. "Athlete building concussion tech for his own sport" is provable only if these exist with dates:
+
+- [ ] **Talk to your own team's athletic trainer** about the sideline concussion workflow. Log what they actually do now, what's broken, what they'd want. This is primary-source product research nobody else in the pool has access to. **By [date].**
+- [ ] **Put one thing they told you into the product.** A field, a step, a checklist item in Redoubt Sideline that came from a real trainer conversation. Commit it. The commit message is the evidence. **By [date].**
+- [ ] **Run it once, for real, in a football context.** A practice, a scrimmage, a single incident logged on an actual sideline. One real run > ten demos. **By [date].**
+- [ ] **Write 3 sentences** on what playing the sport taught you about the problem that a non-athlete founder would never know. That's your essay seed. **By [date].**
+
+If in October you've played 8 weeks of football and NONE of these four boxes are checked, football is no longer the thread — it's just a time-sink wearing a thread costume, and you downgrade to Path B without argument. That's the kill criterion for this decision.
 
 ---
 
